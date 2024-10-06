@@ -1,0 +1,25 @@
+* {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+}
+
+#canvas {
+    background-color: #333;
+    display: block;
+    margin: 0 auto;
+}
+
+.counter-container {
+    text-align: center;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+h1 {
+    color: #444;
+}
+
+#counter {
+    font-size: 2em;
+    color: #007bff;
+}

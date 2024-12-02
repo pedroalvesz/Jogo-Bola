@@ -1,17 +1,8 @@
-import { KeyPressedEnum } from "./KeyPressedEnum.js";
+import { KeyPressedEnum } from "../enum/KeyPressedEnum.js";
 
 export class Platform {
     static COLOR = "#fff";
     static MOVE_VALUE = 5;
-
-    canvas;
-    
-    height;
-    width;
-
-    positionX;
-
-    keyPressed;
 
     constructor(canvas, height, width) {
         this.canvas = canvas;
@@ -22,14 +13,14 @@ export class Platform {
 
     draw(ctx) {
         ctx.beginPath();
-        ctx.rect(this.positionX, canvas.height - this.height, this.width, this.height);
+        ctx.rect(this.positionX, this.canvas.height - this.height, this.width, this.height);
         ctx.fillStyle = Platform.COLOR;
         ctx.fill();
         ctx.closePath();
     }
 
     move() {
-        const shouldMoveRight = KeyPressedEnum.isArrowRight(this.keyPressed) && this.positionX < canvas.width - this.width;
+        const shouldMoveRight = KeyPressedEnum.isArrowRight(this.keyPressed) && this.positionX < this.canvas.width - this.width;
         if (shouldMoveRight) {
             this.positionX += Platform.MOVE_VALUE;
             return;

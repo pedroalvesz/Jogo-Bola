@@ -1,9 +1,9 @@
-import { AudioController } from "./controller/AudioController.js";
 import { Ball } from "./object/Ball.js";
 import { Platform } from "./object/Platform.js";
 import { Block } from "./object/Block.js";
 import { CollisionDetector } from "./CollisionDetector.js";
 import { winButton } from "./component/WinButton.js";
+import { AudioManager } from "./AudioManager.js";
 
 export class BlockBreakerGame {
 
@@ -19,6 +19,8 @@ export class BlockBreakerGame {
 
         this.blockCounter = document.getElementById("counter");
         this.blockCounterValue = 0;
+
+        this.audioManager = this.initAudioManager()
     }
 
     start() {
@@ -27,7 +29,9 @@ export class BlockBreakerGame {
 
         this.bindKeys();
 
-        AudioController.playBackground();
+        this.audioManager.play("background");
+        this.audioManager.setVolume(0.8);
+        this.audioManager.setLoop("background", true);
 
         this.isRunning = true;
         this.loop();
@@ -43,7 +47,7 @@ export class BlockBreakerGame {
         CollisionDetector.checkBallAndWallCollision(this.ball, this.canvas, () => this.onBallCollideWithWall(this.ball));
         CollisionDetector.checkBallAndTopCollision(this.ball, this.canvas, () => this.onBallCollideWithTop(this.ball));
         CollisionDetector.checkBallAndPlatformCollision(this.ball, this.platform, this.canvas, () => this.onBallCollideWithPlatform(this.ball));
-        CollisionDetector.checkBallAndFloorCollision(this.ball, this.canvas, this.platform, this.onBallCollideWithFloor);
+        CollisionDetector.checkBallAndFloorCollision(this.ball, this.canvas, this.platform, this.onBallCollideWithFloor.bind(this));
 
         this.platform.move();
         this.ball.move();
@@ -116,13 +120,14 @@ export class BlockBreakerGame {
     }
 
     onBallCollideWithFloor() {
-        AudioController.playGameOver();
+        this.audioManager.stop("background");
+        this.audioManager.play("gameOver");
 
-        setTimeout(window.location.href = window.location.href, 3000);
+        setTimeout(window.location.href = window.location.href, 4000);
     }
 
     onBallCollideWithPlatform(ball) {
-        AudioController.playPlatformHit();
+        this.audioManager.play("platformHit");
 
         ball.speedY = -ball.speedY;
     }
@@ -141,7 +146,7 @@ export class BlockBreakerGame {
 
         const isAnyBlockVisible = this.blocks.some(block => block.isVisible);
         if (isAnyBlockVisible) {
-            AudioController.playBlockBreak();
+            this.audioManager.play("blockBreak")
         } else {
             this.onWin();
         }
@@ -151,8 +156,8 @@ export class BlockBreakerGame {
     }
 
     onWin() {
-        AudioController.stopBackground();
-        AudioController.playSuccess();
+        this.audioManager.stop("background")
+        this.audioManager.play("success");
 
         this.isRunning = false;
         this.reset()
@@ -162,5 +167,17 @@ export class BlockBreakerGame {
     showWinButton() {
         document.body.appendChild(winButton);
         winButton.style.display = "block";
+    }
+
+    initAudioManager() {
+        const audioManager = new AudioManager();
+
+        audioManager.addAudio("background", '../audio/background.mp3');
+        audioManager.addAudio("success", '../audio/success.mp3');
+        audioManager.addAudio("platformHit", '../audio/platformhit.mp3');
+        audioManager.addAudio("gameOver", '../audio/game-over-arcade.mp3');
+        audioManager.addAudio("blockBreak", '../audio/blockbreak.mp3');
+
+        return audioManager;
     }
 }
